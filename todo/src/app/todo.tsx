@@ -36,7 +36,7 @@ export default function Todo() {
         fetchTodoList()
     },[])
 
-    const addTodoItem = () => {
+    const createTodoItem = () => {
         const fetchCreateTodo = async () => {
             try {
                 const res = await fetch(itemUrl,{
@@ -79,7 +79,7 @@ export default function Todo() {
         fetchDeleteTodo()
     }
 
-    const insertTodoItem = (todoItem: TodoItem, index: number) => {
+    const updateTodoItem = (todoItem: TodoItem, index: number) => {
         const fetchUpdateTodo = async () => {
             try {
                 const res = await fetch(itemUrl,{
@@ -112,7 +112,7 @@ export default function Todo() {
             enable: !todoList[index].enable,
             editing: todoList[index].editing,
         }
-        insertTodoItem(newTodoItem, index)
+        updateTodoItem(newTodoItem, index)
     }
 
     const toggleEditing = (index: number) => {
@@ -122,7 +122,7 @@ export default function Todo() {
             enable: todoList[index].enable,
             editing: !todoList[index].editing,
         }
-        insertTodoItem(newTodoItem, index)
+        updateTodoItem(newTodoItem, index)
     }
 
     const editTodo = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
@@ -132,7 +132,7 @@ export default function Todo() {
             enable: todoList[index].enable,
             editing: todoList[index].editing,
         }
-        insertTodoItem(newTodoItem, index)
+        updateTodoItem(newTodoItem, index)
     }
 
     const endEdit = (e : React.KeyboardEvent<HTMLInputElement>, index: number) => {
@@ -194,7 +194,7 @@ export default function Todo() {
         </List>
         <Box sx={{ textAlign: 'right', '& > :not(style)': { m: 1 }}}>
             <Fab color="secondary" aria-label="add">
-                <AddIcon onClick={addTodoItem}/>
+                <AddIcon onClick={createTodoItem}/>
             </Fab>
         </Box>
     </>
