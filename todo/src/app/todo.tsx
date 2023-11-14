@@ -16,12 +16,7 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from '@mui/icons-material/Delete';
 import CreateIcon from '@mui/icons-material/Create';
 
-type TodoItem = {
-    id: string,
-    todo: string,
-    enable: boolean,
-    editing: boolean,
-}
+import TodoItem from "@/app/type/todoItem";
 
 export default function Todo() {
     const [todoList, setTodoList] = useState<TodoItem[]>([])
