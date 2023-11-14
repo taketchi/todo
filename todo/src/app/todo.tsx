@@ -17,6 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CreateIcon from '@mui/icons-material/Create';
 
 type TodoItem = {
+    id: string,
     todo: string,
     enable: boolean,
     editing: boolean,
@@ -28,6 +29,7 @@ export default function Todo() {
     useEffect(()=>{
         setTodoList([
             {
+                id: 'test',
                 todo: "test",
                 enable: true,
                 editing: false
@@ -36,7 +38,7 @@ export default function Todo() {
     },[])
 
     const addTodoItem = () => {
-        setTodoList([...todoList, {todo:"", enable:true, editing:true }])
+        setTodoList([...todoList, {id: 'test', todo:"", enable:true, editing:true }])
     }
 
     const deleteTodoItem = (idx: number) => {
@@ -54,6 +56,7 @@ export default function Todo() {
 
     const toggleEnable = (index: number) => {
         const newTodoItem: TodoItem = {
+            id:todoList[index].id,
             todo:todoList[index].todo,
             enable: !todoList[index].enable,
             editing: todoList[index].editing,
@@ -63,6 +66,7 @@ export default function Todo() {
 
     const toggleEditing = (index: number) => {
         const newTodoItem: TodoItem = {
+            id:todoList[index].id,
             todo: todoList[index].todo,
             enable: todoList[index].enable,
             editing: !todoList[index].editing,
@@ -72,6 +76,7 @@ export default function Todo() {
 
     const editTodo = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const newTodoItem: TodoItem = {
+            id:todoList[index].id,
             todo: e.target.value,
             enable: todoList[index].enable,
             editing: todoList[index].editing,
