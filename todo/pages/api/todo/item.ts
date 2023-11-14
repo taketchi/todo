@@ -7,27 +7,34 @@ const prisma = new PrismaClient()
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<ErrorMessage>
+    res: NextApiResponse<TodoItem|ErrorMessage>
 ) {
     try {
         const item:TodoItem = req.body
         if (req.method === 'POST') {
-            await prisma.todo.upsert({
-                where: {
-                    id: item.id
-                },
-                update: {
-                    todo: item.todo,
-                    editing: item.editing,
-                    enable: item.enable
-                },
-                create:{
-                    todo: item.todo,
-                    editing: item.editing,
-                    enable: item.enable
-                }
-            });
-            res.status(200)
+            if(item.id === "create") {
+                const newTodoItem:TodoItem = await prisma.todo.create({
+                    data: {
+                        todo: item.todo,
+                        editing: item.editing,
+                        enable: item.enable
+                    },
+                });
+                res.status(200).json(newTodoItem)
+            }
+            else {
+                await prisma.todo.update({
+                    where: {
+                        id: item.id
+                    },
+                    data: {
+                        todo: item.todo,
+                        editing: item.editing,
+                        enable: item.enable
+                    },
+                });
+                res.status(200)
+            }
         }
         else if(req.method === 'DELETE') {
             await prisma.todo.delete({

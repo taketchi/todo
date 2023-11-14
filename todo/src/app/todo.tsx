@@ -11,7 +11,6 @@ import ListItemText from "@mui/material/ListItemText";
 import IconButton from "@mui/material/IconButton";
 import ListItemButton from "@mui/material/ListItemButton";
 import TextField from "@mui/material/TextField";
-
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from '@mui/icons-material/Delete';
 import CreateIcon from '@mui/icons-material/Create';
@@ -20,33 +19,90 @@ import TodoItem from "@/app/type/todoItem";
 
 export default function Todo() {
     const [todoList, setTodoList] = useState<TodoItem[]>([])
+    const listUrl: RequestInfo = "http://localhost:3000/api/todo/list"
+    const itemUrl: RequestInfo = "http://localhost:3000/api/todo/item"
 
     useEffect(()=>{
-        setTodoList([
-            {
-                id: 'test',
-                todo: "test",
-                enable: true,
-                editing: false
+        const fetchTodoList = async () => {
+            try {
+                const res = await fetch(listUrl)
+                const json = await res.json()
+                setTodoList(json)
             }
-        ])
+            catch (e) {
+                console.log('fetch list error')
+            }
+        }
+        fetchTodoList()
     },[])
 
     const addTodoItem = () => {
-        setTodoList([...todoList, {id: 'test', todo:"", enable:true, editing:true }])
+        const fetchCreateTodo = async () => {
+            try {
+                const res = await fetch(itemUrl,{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({id: "create", todo:"", enable:true, editing:true })
+                })
+                if(res.ok){
+                    const newTodoItem:TodoItem = await res.json()
+                    setTodoList([...todoList, newTodoItem])
+                }
+            }
+            catch (e) {
+                console.log('fetch create error')
+            }
+        }
+        fetchCreateTodo()
     }
 
     const deleteTodoItem = (idx: number) => {
-        setTodoList(todoList.filter((_:TodoItem, index:number) => index != idx))
+        const fetchDeleteTodo = async () => {
+            try {
+                const res = await fetch(itemUrl,{
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({id: idx})
+                })
+                if(res.ok){
+                    setTodoList(todoList.filter((_:TodoItem, index:number) => index != idx))
+                }
+            }
+            catch (e) {
+                console.log('fetch delete error')
+            }
+        }
+        fetchDeleteTodo()
     }
 
     const insertTodoItem = (todoItem: TodoItem, index: number) => {
-        const newTodoList :TodoItem[] = [
-            ...todoList.slice(0, index),
-            todoItem,
-            ...todoList.slice(index + 1)
-        ]
-        setTodoList(newTodoList)
+        const fetchUpdateTodo = async () => {
+            try {
+                const res = await fetch(itemUrl,{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(todoItem)
+                })
+                if(res.ok){
+                    const newTodoList :TodoItem[] = [
+                        ...todoList.slice(0, index),
+                        todoItem,
+                        ...todoList.slice(index + 1)
+                    ]
+                    setTodoList(newTodoList)
+                }
+            }
+            catch (e) {
+                console.log('fetch update error')
+            }
+        }
+        fetchUpdateTodo()
     }
 
     const toggleEnable = (index: number) => {
