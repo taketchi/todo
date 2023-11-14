@@ -94,7 +94,7 @@ export default function Todo() {
         if(todoItem.editing){
             return <TextField
                 defaultValue={todoItem.todo}
-                onChange={(event: React.ChangeEvent<HTMLInputElement> ) => editTodo(event,index)}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => editTodo(event,index)}
                 onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>)=> endEdit(event,index)}
                 size="small"
                 fullWidth />
@@ -109,39 +109,37 @@ export default function Todo() {
         }
     }
 
-    const list = todoList.map((todoItem: TodoItem, index:number) =>{
-        return (
-            <ListItem
-                key={index}
-                secondaryAction={
-                <div>
-                    <IconButton edge="end" aria-label="edit">
-                        <CreateIcon onClick={() => toggleEditing(index)}/>
-                    </IconButton>
-                    <IconButton edge="end" aria-label="delete">
-                        <DeleteIcon onClick={() => deleteTodoItem(index)}/>
-                    </IconButton>
-                </div>
-                }
-            >
-                <ListItemButton role={undefined} dense>
-                    <ListItemIcon>
-                        <Checkbox
-                            edge="start"
-                            checked={todoItem.enable}
-                            disableRipple
-                            onClick={() => toggleEnable(index)}
-                        />
-                    </ListItemIcon>
-                    {todoElement(todoItem,index)}
-                </ListItemButton>
-            </ListItem>
-        )
-    })
-
     return <>
         <List>
-            {list}
+            {todoList.map((todoItem: TodoItem, index:number) =>{
+                return (
+                    <ListItem
+                        key={index}
+                        secondaryAction={
+                            <div>
+                                <IconButton edge="end" aria-label="edit">
+                                    <CreateIcon onClick={() => toggleEditing(index)}/>
+                                </IconButton>
+                                <IconButton edge="end" aria-label="delete">
+                                    <DeleteIcon onClick={() => deleteTodoItem(index)}/>
+                                </IconButton>
+                            </div>
+                        }
+                    >
+                        <ListItemButton role={undefined} dense>
+                            <ListItemIcon>
+                                <Checkbox
+                                    edge="start"
+                                    checked={todoItem.enable}
+                                    disableRipple
+                                    onClick={() => toggleEnable(index)}
+                                />
+                            </ListItemIcon>
+                            {todoElement(todoItem,index)}
+                        </ListItemButton>
+                    </ListItem>
+                )
+            })}
         </List>
         <Box sx={{ textAlign: 'right', '& > :not(style)': { m: 1 }}}>
             <Fab color="secondary" aria-label="add">
