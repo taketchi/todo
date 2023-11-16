@@ -66,7 +66,7 @@ export default function Todo() {
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({id: idx})
+                    body: JSON.stringify({id: todoList[idx].id})
                 })
                 if(res.ok){
                     setTodoList(todoList.filter((_:TodoItem, index:number) => index != idx))
