@@ -10,7 +10,7 @@ export default async function handler(
     res: NextApiResponse<TodoItem|ErrorMessage>
 ) {
     try {
-        const item:TodoItem = req.body
+        const item = req.body
         if (req.method === 'POST') {
             if(item.id === "create") {
                 const newTodoItem:TodoItem = await prisma.todo.create({
@@ -33,7 +33,7 @@ export default async function handler(
                         enable: item.enable
                     },
                 });
-                res.status(200)
+                res.status(200).end()
             }
         }
         else if(req.method === 'DELETE') {
@@ -42,7 +42,7 @@ export default async function handler(
                     id: item.id
                 }
             });
-            res.status(200)
+            res.status(200).end()
         }
         else {
             res.status(500).json({ error: 'bad request' })
