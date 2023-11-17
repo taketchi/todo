@@ -19,8 +19,8 @@ import TodoItem from "@/app/type/todoItem";
 
 export default function Todo() {
     const [todoList, setTodoList] = useState<TodoItem[]>([])
-    const listUrl: RequestInfo = "/api/list"
-    const itemUrl: RequestInfo = "/api/item"
+    const listUrl: RequestInfo = "/api/todo/list"
+    const itemUrl: RequestInfo = "/api/todo/item"
 
     useEffect(()=>{
         const fetchTodoList = async () => {
