@@ -1,20 +1,45 @@
-FROM node:latest
+FROM node:lts-alpine AS base
+RUN apk update && apk add  libc6-compat  --update-cache --no-cache
 
-WORKDIR /var/www
+FROM base AS deps
+WORKDIR /app
+COPY /todo/package.json* ./
+RUN npm i
 
-RUN apt update
-RUN apt -y install locales
-RUN localedef -f UTF-8 -i ja_JP ja_JP.UTF-8
-ENV LANG ja_JP.UTF-8
-ENV LANGUAGE ja_JP:ja
-ENV LC_ALL ja_JP.UTF-8
-ENV TZ JST-9
-ENV TERM xterm
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY ./todo .
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN apt install -y vim sqlite
+RUN npm run build
 
-RUN npm install -g npm@latest && npm install create-next-app
+FROM base AS runner
+WORKDIR /app
 
-WORKDIR /var/www/todo
-RUN npm i && npm run build && npm run start
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+COPY --from=builder /app/public ./public
+
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --chown=nextjs:nodejs /sqlite ./sqlite
+
+RUN apk add --no-cache tini sqlite openssl
+ENTRYPOINT ["/sbin/tini", "--"]
+
+USER nextjs
+EXPOSE 3000
+
+ENV PORT 3000
+# set hostname to localhost
+ENV HOSTNAME "0.0.0.0"
+
+CMD ["node", "server.js"]
 
