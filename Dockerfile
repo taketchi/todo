@@ -11,6 +11,10 @@ ENV LC_ALL ja_JP.UTF-8
 ENV TZ JST-9
 ENV TERM xterm
 
-RUN apt install -y vim
+RUN apt install -y vim sqlite
 
 RUN npm install -g npm@latest && npm install create-next-app
+
+WORKDIR /var/www/todo
+RUN npm i && npm run build && npm run start
+
