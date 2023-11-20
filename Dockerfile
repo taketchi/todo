@@ -1,18 +1,19 @@
 FROM node:lts-alpine AS base
-RUN apk update && apk add  libc6-compat  --update-cache --no-cache
+RUN apk update && apk add libc6-compat sqlite openssl --update-cache --no-cache
 
 FROM base AS deps
 WORKDIR /app
-COPY /todo/package.json* ./
+COPY /package.json* ./
 RUN npm i
 
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY ./todo .
+COPY . .
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
+RUN npx prisma migrate dev --name init
 RUN npm run build
 
 FROM base AS runner
@@ -29,9 +30,9 @@ RUN chown nextjs:nodejs .next
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --chown=nextjs:nodejs /sqlite ./sqlite
+COPY --chown=nextjs:nodejs /prisma/sqlite ./prisma/sqlite
 
-RUN apk add --no-cache tini sqlite openssl
+RUN apk add --no-cache tini
 ENTRYPOINT ["/sbin/tini", "--"]
 
 USER nextjs
