@@ -181,7 +181,7 @@ export default function Todo() {
                             <ListItemIcon>
                                 <Checkbox
                                     edge="start"
-                                    checked={todoItem.enable}
+                                    checked={!todoItem.enable}
                                     disableRipple
                                     onClick={() => toggleEnable(index)}
                                 />
