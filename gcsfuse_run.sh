@@ -11,5 +11,5 @@ echo "Mounting completed."
 node /app/.next/standalone/server.js &
 
 # Exit immediately when one of the background processes terminate.
-wait -n
+wait
 # [END cloudrun_fuse_script]
