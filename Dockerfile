@@ -16,31 +16,36 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN npx prisma migrate dev --name init
 RUN npm run build
 
+FROM golang:alpine AS builder2
+WORKDIR /app
+RUN apk add --update --no-cache ca-certificates fuse wget
+RUN go install github.com/googlecloudplatform/gcsfuse@master
+
 FROM base AS runner
 WORKDIR /app
+
+RUN apk add --no-cache tini ca-certificates fuse
+ENTRYPOINT ["/sbin/tini", "--"]
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
-COPY --from=builder /app/public ./public
 
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --chown=nextjs:nodejs /prisma/sqlite ./prisma/sqlite
+COPY --from=builder2 /go/bin/gcsfuse /usr/bin
 
-RUN apk add --no-cache tini
-ENTRYPOINT ["/sbin/tini", "--"]
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./.next/standalone
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+COPY ./gcsfuse_run.sh ./gcsfuse_run.sh
+RUN chmod +x /app/gcsfuse_run.sh
+COPY --chown=nextjs:nodejs .gcs .gcs
+ENV GOOGLE_APPLICATION_CREDENTIALS /app/.gcs/portforio-todo-4aca4a8326d1.json
+ENV MNT_DIR /app/.next/standalone/prisma
 
 USER nextjs
-EXPOSE 3000
-
-ENV PORT 3000
-# set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
-
-CMD ["node", "server.js"]
+CMD ["/app/gcsfuse_run.sh"]
 
