@@ -1,0 +1,4 @@
+dbs:
+  - path: /app/prisma/sqlite/todo.db
+    replicas:
+      - url: ${BACKUP_URL}

@@ -2,7 +2,7 @@
 const nextConfig = {
     output: "standalone",
     env: {
-        PORT: process.env.PORT
+        PORT: "8080"
     }
 }
 
