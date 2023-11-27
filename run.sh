@@ -2,7 +2,7 @@
 
 set -e
 
-if [ ! -f /app/db ]; then
+if [ ! -f /app/prisma/sqlite/todo.db ]; then
 	litestream restore -if-replica-exists -o /app/prisma/sqlite/todo.db "${BACKUP_URL}"
 fi
 

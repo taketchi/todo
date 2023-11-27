@@ -23,17 +23,18 @@ RUN npm run build
 FROM base AS runner
 RUN apk add --no-cache tini
 ENTRYPOINT ["/sbin/tini", "--"]
-
+WORKDIR /app
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
 COPY --from=builder /app/litestream /usr/local/bin/litestream
-COPY --from=builder2 /app/prisma ./prisma
 COPY --from=builder2 /app/.next/standalone ./
+COPY --from=builder2 /app/prisma ./prisma
+RUN rm -rf ./prisma/sqlite/todo.db
+COPY --from=builder2 /app/.next/static ./.next/static
 COPY litestream.yml /etc/litestream.yml
 COPY run.sh ./run.sh
-
+EXPOSE 8080
 RUN chmod +x /app/run.sh
 CMD ["/app/run.sh"]
 
-EXPOSE 8080
